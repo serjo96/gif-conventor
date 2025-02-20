@@ -6,6 +6,8 @@ import { UploadService, UploadProgress } from '../../services/upload.service';
 import { Subscription } from 'rxjs';
 import { FileListComponent } from '../file-list/file-list.component';
 import { environment } from '../../../../../environments/environment';
+import { FileStatusService } from '../../services/file-status.service';
+import { StatusResponse } from '../../types/upload.types';
 
 export enum FileProcessingStatus {
   QUEUED = 'queued',
@@ -27,7 +29,12 @@ export interface UploadedFile {
 @Component({
   selector: 'app-upload',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatProgressBarModule, FileListComponent],
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatProgressBarModule,
+    FileListComponent
+  ],
   templateUrl: './upload.component.html',
   styleUrls: ['./upload.component.scss'],
 })
@@ -44,7 +51,10 @@ export class UploadComponent implements OnDestroy {
   uploadedFiles: UploadedFile[] = [];
   readonly STATUS_CHECK_INTERVAL = 3000; // Changed from 10000 to 3000 ms
 
-  constructor(private uploadService: UploadService) {}
+  constructor(
+    private uploadService: UploadService,
+    private fileStatusService: FileStatusService
+  ) {}
 
   ngOnDestroy(): void {
     this.cancelUpload();
@@ -141,41 +151,22 @@ export class UploadComponent implements OnDestroy {
     }
   }
 
-  private handleStatusUpdate(status: any, jobId: string): void {
-    console.log('Handling status update:', { status, jobId });
-    
+  private handleStatusUpdate(status: StatusResponse, jobId: string): void {
     const fileIndex = this.uploadedFiles.findIndex((f) => f.jobId === jobId);
     if (fileIndex === -1) return;
 
-    const file = this.uploadedFiles[fileIndex];
-    console.log('Current file status:', file.status);
+    const updatedFile = this.fileStatusService.updateFileStatus(
+      this.uploadedFiles[fileIndex],
+      status
+    );
 
-    const statusMap: Record<string, FileProcessingStatus> = {
-      queued: FileProcessingStatus.QUEUED,
-      processing: FileProcessingStatus.PROCESSING,
-      completed: FileProcessingStatus.COMPLETED,
-      failed: FileProcessingStatus.FAILED,
-      not_found: FileProcessingStatus.NOT_FOUND
-    };
-
-    const newStatus = statusMap[status.status as keyof typeof statusMap] || FileProcessingStatus.FAILED;
-    console.log('Mapped new status:', newStatus);
-
-    file.status = newStatus;
-    console.log('Updated file status:', file.status);
+    this.uploadedFiles = this.uploadedFiles.map((file, index) =>
+      index === fileIndex ? updatedFile : file
+    );
 
     if (status.status === 'completed') {
-      file.fileUrl = status.fileUrl;
-      file.error = undefined;
       this.uploadStatus = '';
-    } else if (status.status === 'failed' || status.status === 'not_found') {
-      file.error = status.error?.message || 'File processing error';
-      if (status.error?.validation) {
-        file.validationError = status.error.validation;
-      }
     }
-
-    this.uploadedFiles = [...this.uploadedFiles];
   }
 
   private handleStatusError(): void {
@@ -198,13 +189,11 @@ export class UploadComponent implements OnDestroy {
       (f) => f.jobId === jobId && f.status === FileProcessingStatus.COMPLETED
     );
 
-    if (existingFile) {
-      return;
-    }
+    if (existingFile) return;
 
     this.statusCheckInterval = setInterval(() => {
       const pendingFiles = this.uploadedFiles.filter(
-        (f) => ![FileProcessingStatus.COMPLETED, FileProcessingStatus.FAILED].includes(f.status)
+        (f) => this.fileStatusService.isPending(f.status)
       );
 
       if (pendingFiles.length === 0) {
@@ -212,16 +201,20 @@ export class UploadComponent implements OnDestroy {
         return;
       }
 
-      const jobIds = pendingFiles.map((f) => f.jobId);
-      this.uploadService.getBatchStatus(jobIds).subscribe({
-        next: (statuses) => {
-          statuses.forEach((status, index) => {
-            this.handleStatusUpdate(status, pendingFiles[index].jobId);
-          });
-        },
-        error: this.handleStatusError.bind(this),
-      });
+      this.checkPendingFilesStatus(pendingFiles);
     }, this.STATUS_CHECK_INTERVAL);
+  }
+
+  private checkPendingFilesStatus(pendingFiles: UploadedFile[]): void {
+    const jobIds = pendingFiles.map((f) => f.jobId);
+    this.uploadService.getBatchStatus(jobIds).subscribe({
+      next: (statuses) => {
+        statuses.forEach((status, index) => {
+          this.handleStatusUpdate(status, pendingFiles[index].jobId);
+        });
+      },
+      error: this.handleStatusError.bind(this),
+    });
   }
 
   getFileSize(bytes: number): string {
