@@ -95,10 +95,10 @@ const worker = new Worker<JobData>(
       port: config.redis.port,
       password: config.redis.password
     },
-    concurrency: 1,
+    concurrency: 3,
     limiter: {
-      max: 5,
-      duration: 1000 * 60
+      max: 50,
+      duration: 1000 * 30
     }
   }
 );

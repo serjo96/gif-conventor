@@ -8,13 +8,13 @@ export const conversionQueue = new Queue('video-conversion', {
     password: config.redis.password
   },
   defaultJobOptions: {
-    attempts: 3, // Number of retry attempts
+    attempts: 3,
     backoff: {
       type: 'exponential',
-      delay: 5000 // Initial delay of 5 seconds
+      delay: 2000 // начальная задержка 2 секунды
     },
-    removeOnComplete: false, // Keep completed jobs
-    removeOnFail: false // Keep failed jobs
+    removeOnComplete: true, // удалять успешные задачи для экономии памяти
+    removeOnFail: false    // сохранять неудачные для анализа
   }
 });
 

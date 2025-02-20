@@ -10,10 +10,10 @@ RUN apk add --no-cache tini
 ENTRYPOINT ["/sbin/tini", "--"]
 
 COPY package*.json yarn.lock ./
-RUN yarn install
+RUN yarn install --frozen-lockfile
 
 COPY . .
 RUN yarn build
 
 # Remove debug flag for production
-CMD ["node", "-r", "tsconfig-paths/register", "dist/worker.js"] 
+CMD ["node", "-r", "tsconfig-paths/register", "dist/worker.js"]
