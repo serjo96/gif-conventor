@@ -1,18 +1,14 @@
 {
   "name": "gif-converter",
   "private": true,
-  "workspaces": [
-    "frontend",
-    "backend"
-  ],
   "devDependencies": {
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.2.5"
   },
   "scripts": {
-    "lint": "npm run lint --workspaces",
-    "lint:fix": "npm run lint:fix --workspaces",
-    "format": "npm run format --workspaces"
+    "lint": "npx eslint . --ext .ts",
+    "lint:fix": "npx eslint . --ext .ts --fix",
+    "format": "npx prettier --write ."
   }
 } 
