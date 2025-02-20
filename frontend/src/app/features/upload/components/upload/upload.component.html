@@ -13,7 +13,7 @@
       <div class="upload-content">
         <i class="fas fa-cloud-upload-alt upload-icon"></i>
         <p class="upload-text">
-          {{ selectedFile ? selectedFile.name : 'Click or drag MP4 file here to upload' }}
+          {{ selectedFile ? selectedFile.name : 'Click here to upload file' }}
         </p>
         <p class="upload-hint" *ngIf="!selectedFile">
           Maximum file size: {{ MAX_FILE_SIZE / 1024 / 1024 }}MB
