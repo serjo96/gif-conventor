@@ -8,7 +8,6 @@
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,json,md}\"",
-    "test:recovery": "ts-node -r tsconfig-paths/register src/tests/recovery.test.ts",
     "clean-queues": "ts-node -r tsconfig-paths/register src/scripts/clean-queues.ts"
   },
   "dependencies": {
