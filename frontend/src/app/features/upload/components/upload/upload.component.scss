@@ -1,0 +1,175 @@
+.upload-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  padding: 20px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.file-info {
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-radius: 4px;
+  width: 100%;
+  text-align: center;
+
+  p {
+    margin: 5px 0;
+    color: #666;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.error-message {
+  color: #f44336;
+  text-align: center;
+}
+
+.status-message {
+  color: #666;
+  text-align: center;
+}
+
+.progress-text {
+  text-align: center;
+  margin-top: 5px;
+  color: #666;
+}
+
+mat-progress-bar {
+  width: 100%;
+}
+
+.cancel-button {
+  background-color: #dc3545;
+  
+  &:hover {
+    background-color: #c82333;
+  }
+}
+
+.processing-status {
+  margin-top: 20px;
+  
+  .status-message {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    
+    &.waiting, &.processing {
+      color: #007bff;
+    }
+    
+    &.completed {
+      color: #28a745;
+    }
+    
+    &.error {
+      color: #dc3545;
+    }
+  }
+}
+
+.download-button {
+  margin-top: 10px;
+}
+
+.uploaded-files {
+  margin-top: 20px;
+  width: 100%;
+  
+  h3 {
+    color: #333;
+    margin-bottom: 16px;
+  }
+}
+
+.file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.file-item {
+  background: #f5f5f5;
+  padding: 12px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  .file-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .file-name {
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .file-status {
+    font-size: 0.9em;
+    
+    &.waiting {
+      color: #2196F3;
+    }
+    
+    &.processing {
+      color: #FF9800;
+    }
+    
+    &.completed {
+      color: #4CAF50;
+    }
+    
+    &.error {
+      color: #f44336;
+    }
+  }
+}
+
+.status-container {
+  margin: 10px 0;
+  padding: 8px;
+  border-radius: 4px;
+  text-align: center;
+
+  .status-message {
+    &.error {
+      color: #f44336;
+      background-color: #ffebee;
+      padding: 8px;
+      border-radius: 4px;
+    }
+
+    &.success {
+      color: #4CAF50;
+      background-color: #E8F5E9;
+      padding: 8px;
+      border-radius: 4px;
+    }
+  }
+}
+
+.progress-container {
+  margin: 16px 0;
+  
+  .progress-text {
+    text-align: center;
+    margin-top: 8px;
+    color: #666;
+  }
+}
+
+.files-list-container {
+  margin-top: 24px;
+  display: block;
+} 

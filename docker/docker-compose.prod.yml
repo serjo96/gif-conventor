@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:alpine
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  backend:
+    image: ${REGISTRY:-localhost}/mp4-to-gif-backend:${TAG:-latest}
+    ports:
+      - "3000:3000"
+    volumes:
+      - uploads:/app/uploads
+    env_file:
+      - .env
+    networks:
+      - app-network
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+        failure_action: rollback
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  worker:
+    image: ${REGISTRY:-localhost}/mp4-to-gif-worker:${TAG:-latest}
+    volumes:
+      - uploads:/app/uploads
+    env_file:
+      - .env
+    networks:
+      - app-network
+    deploy:
+      replicas: 5
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 10s
+        order: start-first
+        failure_action: rollback
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 1G
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('bullmq').Worker.isReady()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  redis-data:
+  uploads:
+
+networks:
+  app-network:
+    driver: overlay 

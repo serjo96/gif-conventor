@@ -1,0 +1,30 @@
+<div class="uploaded-files" *ngIf="files.length > 0">
+  <h3>Uploaded Files</h3>
+  <div class="file-list">
+    <div class="file-item" *ngFor="let file of files">
+      <div class="file-info">
+        <span class="file-name">{{ file.fileName }}</span>
+        <span class="file-status" [ngClass]="file.status.toLowerCase()">
+          {{ getStatusMessage(file.status) }}
+          <span class="error-message" *ngIf="file.error">
+            - {{ file.error }}
+          </span>
+          <span class="validation-error" *ngIf="file.validationError">
+            {{ file.validationError }}
+          </span>
+        </span>
+      </div>
+      <div class="file-actions">
+        <a *ngIf="file.status === FileProcessingStatus.COMPLETED && file.fileUrl" 
+           mat-raised-button 
+           color="primary" 
+           [href]="file.fileUrl"
+           target="_blank"
+           download="converted.gif"
+           class="download-button">
+          Download & View GIF
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

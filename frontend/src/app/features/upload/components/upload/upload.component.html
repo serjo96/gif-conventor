@@ -1,0 +1,50 @@
+<div class="upload-container">
+  <input
+    type="file"
+    #fileInput
+    (change)="onFileSelected($event)"
+    accept="video/mp4"
+    [attr.disabled]="isUploading ? '' : null"
+  />
+
+  <div class="file-info" *ngIf="selectedFile">
+    <p>Selected file: {{ selectedFile.name }}</p>
+    <p>Size: {{ getFileSize(selectedFile.size) }}</p>
+  </div>
+
+  <div class="actions">
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="onUpload()"
+      [disabled]="!selectedFile || isUploading"
+    >
+      {{ isUploading ? 'Uploading...' : 'Upload' }}
+    </button>
+
+    <button 
+      mat-button 
+      color="warn" 
+      *ngIf="isUploading"
+      (click)="cancelUpload()"
+    >
+      Cancel
+    </button>
+  </div>
+
+  <div *ngIf="uploadStatus" class="status-container">
+    <div [class]="'status-message ' + (uploadStatus.toLowerCase().includes('error') ? 'error' : 'success')">
+      {{ uploadStatus }}
+    </div>
+  </div>
+
+  <div *ngIf="isUploading" class="progress-container">
+    <mat-progress-bar mode="determinate" [value]="uploadProgress"></mat-progress-bar>
+    <div class="progress-text">{{ uploadProgress }}%</div>
+  </div>
+
+  <app-file-list 
+    [files]="uploadedFiles"
+    class="files-list-container"
+  ></app-file-list>
+</div> 
