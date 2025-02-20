@@ -11,13 +11,7 @@ export class FFmpegConverter {
     jobId: string,
     originalName: string
   ): Promise<string> {
-    console.log('FFMPEG_CONVERTER_INPUTS:', {
-      inputPath,
-      jobId,
-      originalName
-    });
     const outputPath = path.join('uploads/output', `${jobId}-${originalName}.gif`);
-    console.log('FFMPEG_OUTPUT_PATH:', outputPath);
 
     return new Promise((resolve, reject) => {
       const ffmpeg = spawn('ffmpeg', [
@@ -30,11 +24,6 @@ export class FFmpegConverter {
       ]);
 
       let errorOutput = '';
-      let stdoutOutput = '';
-
-      ffmpeg.stdout.on('data', (data) => {
-        stdoutOutput += data.toString();
-      });
 
       ffmpeg.stderr.on('data', (data) => {
         errorOutput += data.toString();
