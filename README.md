@@ -151,14 +151,43 @@ Default configuration:
 
 ## Load Testing
 
-Run performance tests:
+### Running Load Tests
+
+The project includes a simple load testing script to simulate concurrent uploads:
+
 ```bash
-./backend/scripts/load_test.sh -n 1000 -d 0.06
+# Basic test with default settings (100 requests, 10 parallel)
+./backend/tests/simple_load_test.sh -f path/to/test.mp4
+
+# Custom test parameters
+./backend/tests/simple_load_test.sh \
+  -f path/to/test.mp4 \
+  -n 1000 \            # Number of requests
+  -p 20 \              # Max parallel requests
+  -u http://localhost:3000/api/conversion/upload
 ```
 
-Results are saved to `backend/scripts/logs/`:
-- `upload_errors.log`: Failed requests
-- `conversion.log`: Processing times
+Parameters:
+- `-f`: Test file path (required)
+- `-n`: Number of requests (default: 100)
+- `-p`: Max parallel requests (default: 10)
+- `-u`: API URL (default: http://localhost:3000/api/conversion/upload)
+
+### Test Results
+
+The script provides real-time statistics including:
+- Total requests completed
+- Success/failure rates
+- Average response time
+- Requests per second
+- Status code distribution
+
+### Performance Metrics
+
+Default configuration handles:
+- 1000 requests per minute rate limit
+- 3 concurrent jobs per worker
+- 5 worker instances in production deployment
 
 ## API Documentation
 
@@ -313,44 +342,41 @@ yarn clean-queues
 
 ### Running Load Tests
 
-The project includes a load testing script to simulate multiple concurrent uploads:
+The project includes a simple load testing script to simulate concurrent uploads:
 
 ```bash
-# Basic test with default settings
-./backend/scripts/load_test.sh
+# Basic test with default settings (100 requests, 10 parallel)
+./backend/tests/simple_load_test.sh -f path/to/test.mp4
 
 # Custom test parameters
-./backend/scripts/load_test.sh -n 1000 -d 0.06 -u http://localhost:3000/api/conversion/upload
+./backend/tests/simple_load_test.sh \
+  -f path/to/test.mp4 \
+  -n 1000 \            # Number of requests
+  -p 20 \              # Max parallel requests
+  -u http://localhost:3000/api/conversion/upload
 ```
 
 Parameters:
+- `-f`: Test file path (required)
 - `-n`: Number of requests (default: 100)
-- `-d`: Delay between requests in seconds (default: 0.06)
-- `-u`: API URL to test
+- `-p`: Max parallel requests (default: 10)
+- `-u`: API URL (default: http://localhost:3000/api/conversion/upload)
 
 ### Test Results
 
-Results are saved in `backend/scripts/logs/`:
-- `upload_errors.log`: Failed upload attempts
-- `conversion.log`: Conversion processing times
-
-View real-time statistics:
-
-```bash
-# Monitor test progress
-tail -f backend/scripts/logs/conversion.log
-
-# View error summary
-cat backend/scripts/logs/upload_errors.log | sort | uniq -c
-```
+The script provides real-time statistics including:
+- Total requests completed
+- Success/failure rates
+- Average response time
+- Requests per second
+- Status code distribution
 
 ### Performance Metrics
 
 Default configuration handles:
-- 1000 requests per minute
+- 1000 requests per minute rate limit
 - 3 concurrent jobs per worker
-- 5 worker instances in production
-- Auto-scaling based on queue size 
+- 5 worker instances in production deployment
 
 ### Project Structure
 
