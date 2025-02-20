@@ -1,63 +1,76 @@
 <div class="upload-container">
-  <input
-    type="file"
-    #fileInput
-    (change)="onFileSelected($event)"
-    accept="video/mp4"
-    [attr.disabled]="isUploading ? '' : null"
-  />
+  <div class="upload-box">
+    <input
+      type="file"
+      #fileInput
+      (change)="onFileSelected($event)"
+      accept="video/mp4"
+      [attr.disabled]="isUploading ? '' : null"
+      class="hidden"
+    />
 
-  <div
-    class="file-info"
-    *ngIf="selectedFile"
-  >
-    <p>Selected file: {{ selectedFile.name }}</p>
-    <p>Size: {{ getFileSize(selectedFile.size) }}</p>
-  </div>
+    <div class="upload-area" (click)="fileInput.click()">
+      <div class="upload-content">
+        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+        <p class="upload-text">
+          {{ selectedFile ? selectedFile.name : 'Click or drag MP4 file here to upload' }}
+        </p>
+        <p class="upload-hint" *ngIf="!selectedFile">
+          Maximum file size: {{ MAX_FILE_SIZE / 1024 / 1024 }}MB
+        </p>
+      </div>
+    </div>
 
-  <div class="actions">
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="onUpload()"
-      [disabled]="!selectedFile || isUploading"
-    >
-      {{ isUploading ? 'Uploading...' : 'Upload' }}
-    </button>
+    <div class="file-info" *ngIf="selectedFile">
+      <div class="file-details">
+        <span class="file-name">{{ selectedFile.name }}</span>
+        <span class="file-size">{{ getFileSize(selectedFile.size) }}</span>
+      </div>
 
-    <button
-      mat-button
-      color="warn"
-      *ngIf="isUploading"
-      (click)="cancelUpload()"
-    >
-      Cancel
-    </button>
-  </div>
+      <div class="action-buttons">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="onUpload()"
+          [disabled]="isUploading"
+          class="upload-button"
+        >
+          <i class="fas fa-upload"></i>
+          {{ isUploading ? 'Uploading...' : 'Upload' }}
+        </button>
 
-  <div
-    *ngIf="uploadStatus"
-    class="status-container"
-  >
-    <div
-      [class]="
-        'status-message ' +
-        (uploadStatus.toLowerCase().includes('error') ? 'error' : 'success')
-      "
-    >
-      {{ uploadStatus }}
+        <button
+          mat-button
+          color="warn"
+          *ngIf="isUploading"
+          (click)="cancelUpload()"
+          class="cancel-button"
+        >
+          <i class="fas fa-times"></i>
+          Cancel
+        </button>
+      </div>
     </div>
   </div>
 
-  <div
-    *ngIf="isUploading"
-    class="progress-container"
-  >
-    <mat-progress-bar
-      mode="determinate"
-      [value]="uploadProgress"
-    ></mat-progress-bar>
-    <div class="progress-text">{{ uploadProgress }}%</div>
+  <div class="status-section" *ngIf="uploadStatus || isUploading">
+    <div
+      *ngIf="uploadStatus"
+      class="status-message"
+      [class.error]="uploadStatus.toLowerCase().includes('error')"
+      [class.success]="!uploadStatus.toLowerCase().includes('error')"
+    >
+      {{ uploadStatus }}
+    </div>
+
+    <div *ngIf="isUploading" class="progress-container">
+      <mat-progress-bar
+        mode="determinate"
+        [value]="uploadProgress"
+        class="upload-progress"
+      ></mat-progress-bar>
+      <span class="progress-text">{{ uploadProgress }}%</span>
+    </div>
   </div>
 
   <app-file-list

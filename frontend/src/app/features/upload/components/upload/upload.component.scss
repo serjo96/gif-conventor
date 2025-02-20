@@ -1,176 +1,138 @@
 .upload-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  align-items: center;
-  padding: 20px;
-  max-width: 400px;
+  max-width: 800px;
   margin: 0 auto;
+  padding: 20px;
 }
 
-.file-info {
-  background-color: #f5f5f5;
-  padding: 10px;
-  border-radius: 4px;
-  width: 100%;
+.upload-box {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.hidden {
+  display: none;
+}
+
+.upload-area {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 40px 20px;
   text-align: center;
-
-  p {
-    margin: 5px 0;
-    color: #666;
-  }
-}
-
-.actions {
-  display: flex;
-  gap: 10px;
-  margin: 10px 0;
-}
-
-.error-message {
-  color: #f44336;
-  text-align: center;
-}
-
-.status-message {
-  color: #666;
-  text-align: center;
-}
-
-.progress-text {
-  text-align: center;
-  margin-top: 5px;
-  color: #666;
-}
-
-mat-progress-bar {
-  width: 100%;
-}
-
-.cancel-button {
-  background-color: #dc3545;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #fafafa;
+  margin: 20px;
 
   &:hover {
-    background-color: #c82333;
+    border-color: #2196f3;
+    background-color: #e3f2fd;
   }
 }
 
-.processing-status {
-  margin-top: 20px;
-
-  .status-message {
-    font-size: 1.1em;
-    margin-bottom: 10px;
-
-    &.waiting,
-    &.processing {
-      color: #007bff;
-    }
-
-    &.completed {
-      color: #28a745;
-    }
-
-    &.error {
-      color: #dc3545;
-    }
-  }
-}
-
-.download-button {
-  margin-top: 10px;
-}
-
-.uploaded-files {
-  margin-top: 20px;
-  width: 100%;
-
-  h3 {
-    color: #333;
-    margin-bottom: 16px;
-  }
-}
-
-.file-list {
+.upload-content {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 12px;
 }
 
-.file-item {
-  background: #f5f5f5;
-  padding: 12px;
-  border-radius: 4px;
+.upload-icon {
+  font-size: 48px;
+  color: #2196f3;
+}
+
+.upload-text {
+  font-size: 1.2em;
+  color: #333;
+  margin: 0;
+}
+
+.upload-hint {
+  color: #666;
+  font-size: 0.9em;
+  margin: 0;
+}
+
+.file-info {
+  padding: 20px;
+  border-top: 1px solid #eee;
+}
+
+.file-details {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 16px;
+}
 
-  .file-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
+.file-name {
+  font-weight: 500;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-  .file-name {
-    font-weight: 500;
-    color: #333;
-  }
+.file-size {
+  color: #666;
+  font-size: 0.9em;
+}
 
-  .file-status {
-    font-size: 0.9em;
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
 
-    &.waiting {
-      color: #2196f3;
-    }
-
-    &.processing {
-      color: #ff9800;
-    }
-
-    &.completed {
-      color: #4caf50;
-    }
-
-    &.error {
-      color: #f44336;
-    }
+.upload-button, .cancel-button {
+  i {
+    margin-right: 8px;
   }
 }
 
-.status-container {
-  margin: 10px 0;
-  padding: 8px;
-  border-radius: 4px;
+.status-section {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-message {
   text-align: center;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 12px;
 
-  .status-message {
-    &.error {
-      color: #f44336;
-      background-color: #ffebee;
-      padding: 8px;
-      border-radius: 4px;
-    }
+  &.error {
+    background-color: #ffebee;
+    color: #d32f2f;
+  }
 
-    &.success {
-      color: #4caf50;
-      background-color: #e8f5e9;
-      padding: 8px;
-      border-radius: 4px;
-    }
+  &.success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
   }
 }
 
 .progress-container {
-  margin: 16px 0;
+  .upload-progress {
+    height: 8px;
+    border-radius: 4px;
+  }
 
   .progress-text {
+    display: block;
     text-align: center;
-    margin-top: 8px;
     color: #666;
+    margin-top: 8px;
+    font-size: 0.9em;
   }
 }
 
 .files-list-container {
-  margin-top: 24px;
+  margin-top: 20px;
   display: block;
 }
