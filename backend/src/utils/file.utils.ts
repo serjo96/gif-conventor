@@ -22,10 +22,14 @@ export class FileValidator {
   private static async validateVideoDimensions(filePath: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const ffprobe = spawn('ffprobe', [
-        '-v', 'error',
-        '-select_streams', 'v:0',
-        '-show_entries', 'stream=width,height',
-        '-of', 'json',
+        '-v',
+        'error',
+        '-select_streams',
+        'v:0',
+        '-show_entries',
+        'stream=width,height',
+        '-of',
+        'json',
         filePath
       ]);
 
@@ -46,7 +50,12 @@ export class FileValidator {
           const { width, height } = streams[0];
 
           if (width > this.MAX_WIDTH || height > this.MAX_HEIGHT) {
-            reject(new ApiError(400, `Video dimensions must not exceed ${this.MAX_WIDTH}x${this.MAX_HEIGHT}`));
+            reject(
+              new ApiError(
+                400,
+                `Video dimensions must not exceed ${this.MAX_WIDTH}x${this.MAX_HEIGHT}`
+              )
+            );
             return;
           }
 
@@ -61,9 +70,12 @@ export class FileValidator {
   private static async validateVideoDuration(filePath: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const ffprobe = spawn('ffprobe', [
-        '-v', 'error',
-        '-show_entries', 'format=duration',
-        '-of', 'json',
+        '-v',
+        'error',
+        '-show_entries',
+        'format=duration',
+        '-of',
+        'json',
         filePath
       ]);
 
@@ -84,7 +96,9 @@ export class FileValidator {
           const duration = parseFloat(format.duration);
 
           if (duration > this.MAX_DURATION) {
-            reject(new ApiError(400, `Video duration must not exceed ${this.MAX_DURATION} seconds`));
+            reject(
+              new ApiError(400, `Video duration must not exceed ${this.MAX_DURATION} seconds`)
+            );
             return;
           }
 

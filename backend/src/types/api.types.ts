@@ -9,7 +9,7 @@ export enum ErrorCode {
   ROUTE_NOT_FOUND = 'ROUTE_NOT_FOUND',
   INTERNAL_ERROR = 'INTERNAL_ERROR',
   JOB_NOT_FOUND = 'JOB_NOT_FOUND',
-  INVALID_REQUEST = 'INVALID_REQUEST',
+  INVALID_REQUEST = 'INVALID_REQUEST'
 }
 
 export class ApiError extends Error {
@@ -59,4 +59,4 @@ export interface BatchStatusResponse {
       code: ErrorCode;
     };
   }>;
-} 
+}

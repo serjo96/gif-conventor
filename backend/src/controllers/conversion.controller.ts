@@ -25,45 +25,49 @@ export class ConversionController {
         success: true,
         data: {
           jobId,
-          status: 'queued',
-        },
+          status: 'queued'
+        }
       };
 
       res.json(response);
     } catch (error) {
       next(error);
     }
-  }
+  };
 
   getStatus = async (req: StatusRequest, res: Response, next: NextFunction) => {
     try {
       const { jobId } = req.params;
       const job = await this.conversionService.getJobDetails(jobId);
-      console.log('JOB_DATA_CONTROLLER',job);
+      console.log('JOB_DATA_CONTROLLER', job);
       const response: ApiResponse<ConversionResponse> = {
         success: true,
         data: {
           jobId,
           status: job.status,
           ...(job.status === 'completed' && {
-            outputUrl: `${config.baseUrl}/${job.outputPath}`,
+            outputUrl: `${config.baseUrl}/${job.outputPath}`
           }),
           ...(job.error && {
             error: {
               message: job.error.message,
               code: job.error.code as ErrorCode
             }
-          }),
-        },
+          })
+        }
       };
 
       res.json(response);
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  getBatchStatus = async (req: Request<any, any, { jobIds: string[] }>, res: Response, next: NextFunction) => {
+  getBatchStatus = async (
+    req: Request<any, any, { jobIds: string[] }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const { jobIds } = req.body;
 
@@ -74,19 +78,19 @@ export class ConversionController {
         jobIds.map(async (jobId) => {
           try {
             const job = await this.conversionService.getJobDetails(jobId);
-            console.log('JOB_DATA_CONTROLLER',job);
+            console.log('JOB_DATA_CONTROLLER', job);
             return {
               jobId,
               status: job.status,
               ...(job.status === 'completed' && {
-                outputUrl: `${config.baseUrl}/${job.outputPath}`,
+                outputUrl: `${config.baseUrl}/${job.outputPath}`
               }),
               ...(job.error && {
                 error: {
                   message: job.error.message,
                   code: job.error.code as ErrorCode
                 }
-              }),
+              })
             };
           } catch (error) {
             return {
@@ -97,17 +101,17 @@ export class ConversionController {
         })
       );
 
-      console.log('STATUS_UPDATES_CONTROLLER',statuses);
+      console.log('STATUS_UPDATES_CONTROLLER', statuses);
       const response: ApiResponse<BatchStatusResponse> = {
         success: true,
         data: {
           jobs: statuses
-        },
+        }
       };
 
       res.json(response);
     } catch (error) {
       next(error);
     }
-  }
+  };
 }

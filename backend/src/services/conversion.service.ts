@@ -24,7 +24,7 @@ export class ConversionService {
   private readonly outputDir = 'uploads/output';
 
   constructor() {
-    this.ensureDirectories().catch(error => {
+    this.ensureDirectories().catch((error) => {
       console.error('Failed to create required directories:', error);
       process.exit(1);
     });
@@ -39,7 +39,11 @@ export class ConversionService {
           await fs.mkdir(dir, { recursive: true });
         } catch (error: unknown) {
           const message = error instanceof Error ? error.message : 'Unknown error';
-          throw new ApiError(500, `Failed to create directory ${dir}: ${message}`, ErrorCode.DIRECTORY_CREATE_ERROR);
+          throw new ApiError(
+            500,
+            `Failed to create directory ${dir}: ${message}`,
+            ErrorCode.DIRECTORY_CREATE_ERROR
+          );
         }
       }
     }
@@ -74,42 +78,58 @@ export class ConversionService {
     const inputPath = path.join(this.inputDir, inputFileName);
 
     console.log('[DEBUG] File processing details:', {
-        jobId,
-        originalFile: {
-            path: file.path,
-            name: file.originalname,
-            exists: await fs.access(file.path).then(() => true).catch(() => false)
-        },
-        destination: {
-            path: inputPath,
-            dir: this.inputDir,
-            dirExists: await fs.access(this.inputDir).then(() => true).catch(() => false)
-        }
+      jobId,
+      originalFile: {
+        path: file.path,
+        name: file.originalname,
+        exists: await fs
+          .access(file.path)
+          .then(() => true)
+          .catch(() => false)
+      },
+      destination: {
+        path: inputPath,
+        dir: this.inputDir,
+        dirExists: await fs
+          .access(this.inputDir)
+          .then(() => true)
+          .catch(() => false)
+      }
     });
 
     try {
-        await fs.rename(file.path, inputPath);
+      await fs.rename(file.path, inputPath);
 
-        console.log('[DEBUG] After rename:', {
-            sourceExists: await fs.access(file.path).then(() => true).catch(() => false),
-            destinationExists: await fs.access(inputPath).then(() => true).catch(() => false),
-            inputDirContents: await fs.readdir(this.inputDir)
-        });
+      console.log('[DEBUG] After rename:', {
+        sourceExists: await fs
+          .access(file.path)
+          .then(() => true)
+          .catch(() => false),
+        destinationExists: await fs
+          .access(inputPath)
+          .then(() => true)
+          .catch(() => false),
+        inputDirContents: await fs.readdir(this.inputDir)
+      });
 
-        await conversionQueue.add('convert', {
-            inputPath,
-            jobId,
-            originalName
-        }, {
-            jobId,
-            removeOnComplete: false,
-            removeOnFail: 1000 * 60 * 60 * 24
-        });
+      await conversionQueue.add(
+        'convert',
+        {
+          inputPath,
+          jobId,
+          originalName
+        },
+        {
+          jobId,
+          removeOnComplete: false,
+          removeOnFail: 1000 * 60 * 60 * 24
+        }
+      );
 
-        return jobId;
+      return jobId;
     } catch (error) {
-        console.error('[ERROR] Video processing failed:', error);
-        throw error;
+      console.error('[ERROR] Video processing failed:', error);
+      throw error;
     }
   }
 
@@ -122,7 +142,7 @@ export class ConversionService {
     const jobState = await queueJob.getState();
     const status = this.mapBullState(jobState);
     const originalName = queueJob.data.originalName || jobId;
-    console.log('ORIGINAL_NAME_SERVICE',originalName);
+    console.log('ORIGINAL_NAME_SERVICE', originalName);
     return {
       id: jobId,
       status,

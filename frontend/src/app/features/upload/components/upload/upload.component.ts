@@ -4,14 +4,14 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { CommonModule } from '@angular/common';
 import { UploadService, UploadProgress } from '../../services/upload.service';
 import { Subscription } from 'rxjs';
-import {FileListComponent} from '../file-list/file-list.component';
-import {environment} from '../../../../../environments/environment';
+import { FileListComponent } from '../file-list/file-list.component';
+import { environment } from '../../../../../environments/environment';
 
 export enum FileProcessingStatus {
   WAITING = 'waiting',
   PROCESSING = 'processing',
   COMPLETED = 'completed',
-  ERROR = 'error'
+  ERROR = 'error',
 }
 
 export interface UploadedFile {
@@ -26,14 +26,9 @@ export interface UploadedFile {
 @Component({
   selector: 'app-upload',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatButtonModule,
-    MatProgressBarModule,
-    FileListComponent
-  ],
+  imports: [CommonModule, MatButtonModule, MatProgressBarModule, FileListComponent],
   templateUrl: './upload.component.html',
-  styleUrls: ['./upload.component.scss']
+  styleUrls: ['./upload.component.scss'],
 })
 export class UploadComponent implements OnDestroy {
   selectedFile: File | null = null;
@@ -92,7 +87,7 @@ export class UploadComponent implements OnDestroy {
           this.handleUploadComplete(event.jobId);
         }
       },
-      error: this.handleUploadError.bind(this)
+      error: this.handleUploadError.bind(this),
     });
   }
 
@@ -112,7 +107,7 @@ export class UploadComponent implements OnDestroy {
     this.uploadedFiles.push({
       jobId,
       fileName: this.selectedFile?.name || 'Unknown file',
-      status: FileProcessingStatus.WAITING
+      status: FileProcessingStatus.WAITING,
     });
 
     console.log(this.uploadedFiles);
@@ -131,7 +126,7 @@ export class UploadComponent implements OnDestroy {
       jobId: 'error',
       fileName: this.selectedFile?.name || 'Unknown file',
       status: FileProcessingStatus.ERROR,
-      error: error.error?.error?.message || error.error?.message || 'File upload error'
+      error: error.error?.error?.message || error.error?.message || 'File upload error',
     });
 
     this.uploadStatus = ''; // Clear the upload status since we're showing error in the list
@@ -150,9 +145,8 @@ export class UploadComponent implements OnDestroy {
   private startProcessingCheck(jobId: string): void {
     this.clearStatusCheck();
 
-    const existingFile = this.uploadedFiles.find(f =>
-      f.jobId === jobId &&
-      (f.status === FileProcessingStatus.COMPLETED || f.fileUrl)
+    const existingFile = this.uploadedFiles.find(
+      (f) => f.jobId === jobId && (f.status === FileProcessingStatus.COMPLETED || f.fileUrl)
     );
 
     if (existingFile) {
@@ -162,9 +156,9 @@ export class UploadComponent implements OnDestroy {
     this.processingStatus = FileProcessingStatus.WAITING;
 
     this.statusCheckInterval = setInterval(() => {
-      const pendingFiles = this.uploadedFiles.filter(f =>
-        f.status !== FileProcessingStatus.COMPLETED &&
-        f.status !== FileProcessingStatus.ERROR
+      const pendingFiles = this.uploadedFiles.filter(
+        (f) =>
+          f.status !== FileProcessingStatus.COMPLETED && f.status !== FileProcessingStatus.ERROR
       );
 
       if (pendingFiles.length === 0) {
@@ -172,37 +166,37 @@ export class UploadComponent implements OnDestroy {
         return;
       }
 
-      const jobIds = pendingFiles.map(f => f.jobId);
-      console.log('JOB_IDS',jobIds);
+      const jobIds = pendingFiles.map((f) => f.jobId);
+      console.log('JOB_IDS', jobIds);
       this.uploadService.getBatchStatus(jobIds).subscribe({
         next: (statuses) => {
-          console.log('STATUS_UPDATES',statuses);
+          console.log('STATUS_UPDATES', statuses);
           statuses.forEach((status, index) => {
             this.handleStatusUpdate(status, pendingFiles[index].jobId);
           });
         },
-        error: this.handleStatusError.bind(this)
+        error: this.handleStatusError.bind(this),
       });
     }, this.STATUS_CHECK_INTERVAL);
   }
 
   private handleStatusUpdate(status: any, jobId: string): void {
-    const fileIndex = this.uploadedFiles.findIndex(f => f.jobId === jobId);
+    const fileIndex = this.uploadedFiles.findIndex((f) => f.jobId === jobId);
     if (fileIndex === -1) return;
 
     const file = this.uploadedFiles[fileIndex];
 
     const statusMap: Record<string, FileProcessingStatus> = {
-      'queued': FileProcessingStatus.WAITING,
-      'processing': FileProcessingStatus.PROCESSING,
-      'completed': FileProcessingStatus.COMPLETED,
-      'failed': FileProcessingStatus.ERROR,
-      'not_found': FileProcessingStatus.ERROR
+      queued: FileProcessingStatus.WAITING,
+      processing: FileProcessingStatus.PROCESSING,
+      completed: FileProcessingStatus.COMPLETED,
+      failed: FileProcessingStatus.ERROR,
+      not_found: FileProcessingStatus.ERROR,
     };
 
     file.status = statusMap[status.status as keyof typeof statusMap] || FileProcessingStatus.ERROR;
-    console.log('FILE_STATUS',file);
-    console.log('STATUS',status);
+    console.log('FILE_STATUS', file);
+    console.log('STATUS', status);
     if (status.status === 'completed') {
       file.fileUrl = status.fileUrl;
       file.error = undefined;

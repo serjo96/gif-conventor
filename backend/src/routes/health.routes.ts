@@ -6,4 +6,4 @@ const healthController = new HealthController();
 
 router.get('/ping', healthController.ping);
 
-export default router; 
+export default router;

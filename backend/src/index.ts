@@ -12,13 +12,15 @@ import { serverAdapter, basicAuthMiddleware } from './config/bull-board';
 const app = express();
 
 // Middleware
-app.use(cors({
-  origin: config.corsOrigin,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Content-Length', 'X-Requested-With'],
-  exposedHeaders: ['Content-Length', 'Content-Disposition']
-}));
+app.use(
+  cors({
+    origin: config.corsOrigin,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Content-Length', 'X-Requested-With'],
+    exposedHeaders: ['Content-Length', 'Content-Disposition']
+  })
+);
 
 app.use(express.json());
 app.use(morgan(config.nodeEnv === 'development' ? 'dev' : 'combined'));

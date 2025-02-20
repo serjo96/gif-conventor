@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpEventType, HttpEvent } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import {environment} from '../../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 
 export interface ConversionStatus {
   status: 'pending' | 'processing' | 'completed' | 'failed';
@@ -21,7 +21,7 @@ export interface ConversionResponse {
     status: 'pending' | 'processing' | 'completed' | 'failed';
     outputUrl?: string;
     error?: string;
-  }
+  };
 }
 
 interface BatchStatusResponse {
@@ -42,7 +42,7 @@ interface ApiResponse<T> {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UploadService {
   private apiUrl = environment.apiUrl;
@@ -53,48 +53,56 @@ export class UploadService {
     const formData = new FormData();
     formData.append('video', file);
 
-    return this.http.post(`${this.apiUrl}/conversion/upload`, formData, {
-      reportProgress: true,
-      observe: 'events'
-    }).pipe(
-      map((event: HttpEvent<any>): UploadProgress => {
-        if (event.type === HttpEventType.UploadProgress) {
-          const progress = Math.round((100 * event.loaded) / (event.total ?? event.loaded));
-          return { type: 'progress', progress };
-        }
-
-        if (event.type === HttpEventType.Response) {
-          return {
-            type: 'complete',
-            jobId: event.body.data.jobId
-          };
-        }
-
-        return { type: 'progress', progress: 0 };
+    return this.http
+      .post(`${this.apiUrl}/conversion/upload`, formData, {
+        reportProgress: true,
+        observe: 'events',
       })
-    );
-  }
-
-  getStatus(jobId: string): Observable<ConversionStatus> {
-    return this.http.get<ConversionResponse>(`${this.apiUrl}/conversion/status/${jobId}`)
       .pipe(
-        map(response => ({
-          status: response.data.status,
-          fileUrl: response.data.outputUrl,
-          error: response.data.error
-        }))
+        map((event: HttpEvent<any>): UploadProgress => {
+          if (event.type === HttpEventType.UploadProgress) {
+            const progress = Math.round((100 * event.loaded) / (event.total ?? event.loaded));
+            return { type: 'progress', progress };
+          }
+
+          if (event.type === HttpEventType.Response) {
+            return {
+              type: 'complete',
+              jobId: event.body.data.jobId,
+            };
+          }
+
+          return { type: 'progress', progress: 0 };
+        })
       );
   }
 
+  getStatus(jobId: string): Observable<ConversionStatus> {
+    return this.http.get<ConversionResponse>(`${this.apiUrl}/conversion/status/${jobId}`).pipe(
+      map((response) => ({
+        status: response.data.status,
+        fileUrl: response.data.outputUrl,
+        error: response.data.error,
+      }))
+    );
+  }
+
   getBatchStatus(jobIds: string[]): Observable<ConversionStatus[]> {
-    return this.http.post<ApiResponse<BatchStatusResponse>>(`${this.apiUrl}/conversion/status`, { jobIds })
+    return this.http
+      .post<ApiResponse<BatchStatusResponse>>(`${this.apiUrl}/conversion/status`, { jobIds })
       .pipe(
-        map(response => response.data.jobs.map(job => ({
-          status: job.status === 'queued' ? 'pending' :
-                 job.status === 'not_found' ? 'failed' : job.status,
-          fileUrl: job.outputUrl,
-          error: job.error?.message
-        })))
+        map((response) =>
+          response.data.jobs.map((job) => ({
+            status:
+              job.status === 'queued'
+                ? 'pending'
+                : job.status === 'not_found'
+                  ? 'failed'
+                  : job.status,
+            fileUrl: job.outputUrl,
+            error: job.error?.message,
+          }))
+        )
       );
   }
 }

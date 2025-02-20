@@ -1,7 +1,7 @@
 .uploaded-files {
   margin-top: 20px;
   width: 100%;
-  
+
   h3 {
     color: #333;
     margin-bottom: 16px;
@@ -22,27 +22,28 @@
   background: #f5f5f5;
   border-radius: 4px;
   margin-bottom: 8px;
-  
+
   .file-info {
     display: flex;
     flex-direction: column;
     gap: 4px;
   }
-  
+
   .file-name {
     font-weight: 500;
     color: #333;
   }
-  
+
   .file-status {
     &.completed {
-      color: #4CAF50;
+      color: #4caf50;
     }
-    
+
     &.error {
       color: #f44336;
-      
-      .error-message, .validation-error {
+
+      .error-message,
+      .validation-error {
         display: block;
         font-size: 0.9em;
         margin-top: 4px;
@@ -52,9 +53,10 @@
         color: #d32f2f;
       }
     }
-    
-    &.processing, &.waiting {
-      color: #2196F3;
+
+    &.processing,
+    &.waiting {
+      color: #2196f3;
     }
   }
 }
@@ -62,11 +64,11 @@
 .file-actions {
   .download-button {
     min-width: 150px;
-    background-color: #4CAF50;
+    background-color: #4caf50;
     color: white;
-    
+
     &:hover {
       background-color: #45a049;
     }
   }
-} 
+}

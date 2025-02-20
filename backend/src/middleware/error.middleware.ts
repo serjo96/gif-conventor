@@ -1,14 +1,9 @@
-import {Request, Response, NextFunction} from 'express';
-import multer from "multer";
+import { Request, Response, NextFunction } from 'express';
+import multer from 'multer';
 import { ApiError } from '../types/api.types';
 import { ErrorCode } from '../types/api.types';
 
-export const errorHandler = (
-  err: Error,
-  req: Request,
-  res: Response,
-  _: NextFunction
-): void => {
+export const errorHandler = (err: Error, req: Request, res: Response, _: NextFunction): void => {
   console.error(err);
 
   if (err instanceof ApiError) {
@@ -46,10 +41,6 @@ export const errorHandler = (
   });
 };
 
-export const notFoundHandler = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const notFoundHandler = (req: Request, res: Response, next: NextFunction) => {
   next(new ApiError(404, `Route ${req.originalUrl} not found`, ErrorCode.ROUTE_NOT_FOUND));
 };

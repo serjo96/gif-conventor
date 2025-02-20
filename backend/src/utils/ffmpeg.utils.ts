@@ -21,8 +21,10 @@ export class FFmpegConverter {
 
     return new Promise((resolve, reject) => {
       const ffmpeg = spawn('ffmpeg', [
-        '-i', inputPath,
-        '-vf', `fps=${this.OUTPUT_FPS},scale=-1:${this.OUTPUT_HEIGHT}:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse`,
+        '-i',
+        inputPath,
+        '-vf',
+        `fps=${this.OUTPUT_FPS},scale=-1:${this.OUTPUT_HEIGHT}:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse`,
         '-y',
         outputPath
       ]);

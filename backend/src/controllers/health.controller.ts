@@ -22,4 +22,4 @@ export class HealthController {
 
     res.json(response);
   }
-} 
+}

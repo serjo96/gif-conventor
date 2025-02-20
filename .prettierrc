@@ -7,17 +7,39 @@
   "bracketSpacing": true,
   "arrowParens": "always",
   "endOfLine": "lf",
+  "htmlWhitespaceSensitivity": "css",
+  "bracketSameLine": false,
+  "singleAttributePerLine": true,
   "overrides": [
     {
-      "files": "*.html",
+      "files": ["*.html", "*.component.html"],
       "options": {
-        "parser": "html"
+        "parser": "angular",
+        "printWidth": 80,
+        "singleAttributePerLine": true
       }
     },
     {
-      "files": "*.component.html",
+      "files": ["frontend/**/*.ts"],
       "options": {
-        "parser": "angular"
+        "printWidth": 100,
+        "parser": "typescript",
+        "singleAttributePerLine": true,
+        "importOrderSeparation": true,
+        "importOrderSortSpecifiers": true
+      }
+    },
+    {
+      "files": ["backend/**/*.ts"],
+      "options": {
+        "printWidth": 100,
+        "parser": "typescript",
+        "singleAttributePerLine": false,
+        "importOrderSeparation": true,
+        "importOrderSortSpecifiers": true,
+        "arrayBracketSpacing": false,
+        "bracketSpacing": true,
+        "trailingComma": "none"
       }
     }
   ]

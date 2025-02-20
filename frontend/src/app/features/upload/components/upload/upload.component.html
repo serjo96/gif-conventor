@@ -7,24 +7,27 @@
     [attr.disabled]="isUploading ? '' : null"
   />
 
-  <div class="file-info" *ngIf="selectedFile">
+  <div
+    class="file-info"
+    *ngIf="selectedFile"
+  >
     <p>Selected file: {{ selectedFile.name }}</p>
     <p>Size: {{ getFileSize(selectedFile.size) }}</p>
   </div>
 
   <div class="actions">
-    <button 
-      mat-raised-button 
-      color="primary" 
+    <button
+      mat-raised-button
+      color="primary"
       (click)="onUpload()"
       [disabled]="!selectedFile || isUploading"
     >
       {{ isUploading ? 'Uploading...' : 'Upload' }}
     </button>
 
-    <button 
-      mat-button 
-      color="warn" 
+    <button
+      mat-button
+      color="warn"
       *ngIf="isUploading"
       (click)="cancelUpload()"
     >
@@ -32,19 +35,33 @@
     </button>
   </div>
 
-  <div *ngIf="uploadStatus" class="status-container">
-    <div [class]="'status-message ' + (uploadStatus.toLowerCase().includes('error') ? 'error' : 'success')">
+  <div
+    *ngIf="uploadStatus"
+    class="status-container"
+  >
+    <div
+      [class]="
+        'status-message ' +
+        (uploadStatus.toLowerCase().includes('error') ? 'error' : 'success')
+      "
+    >
       {{ uploadStatus }}
     </div>
   </div>
 
-  <div *ngIf="isUploading" class="progress-container">
-    <mat-progress-bar mode="determinate" [value]="uploadProgress"></mat-progress-bar>
+  <div
+    *ngIf="isUploading"
+    class="progress-container"
+  >
+    <mat-progress-bar
+      mode="determinate"
+      [value]="uploadProgress"
+    ></mat-progress-bar>
     <div class="progress-text">{{ uploadProgress }}%</div>
   </div>
 
-  <app-file-list 
+  <app-file-list
     [files]="uploadedFiles"
     class="files-list-container"
   ></app-file-list>
-</div> 
+</div>

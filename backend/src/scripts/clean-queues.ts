@@ -3,9 +3,9 @@ import { conversionQueue } from '../queues';
 async function cleanQueues() {
   try {
     console.log('🧹 Starting queue cleanup...');
-    
+
     await conversionQueue.obliterate({ force: true });
-    
+
     console.log('✅ Queues cleaned successfully');
     process.exit(0);
   } catch (error) {
@@ -14,4 +14,4 @@ async function cleanQueues() {
   }
 }
 
-cleanQueues(); 
+cleanQueues();
