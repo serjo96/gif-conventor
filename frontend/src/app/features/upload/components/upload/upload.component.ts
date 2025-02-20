@@ -8,10 +8,11 @@ import { FileListComponent } from '../file-list/file-list.component';
 import { environment } from '../../../../../environments/environment';
 
 export enum FileProcessingStatus {
-  WAITING = 'waiting',
+  QUEUED = 'queued',
   PROCESSING = 'processing',
   COMPLETED = 'completed',
-  ERROR = 'error',
+  FAILED = 'failed',
+  NOT_FOUND = 'not_found'
 }
 
 export interface UploadedFile {
@@ -41,7 +42,7 @@ export class UploadComponent implements OnDestroy {
   downloadUrl: string | null = null;
   private statusCheckInterval: any;
   uploadedFiles: UploadedFile[] = [];
-  readonly STATUS_CHECK_INTERVAL = 10000; // 10 seconds
+  readonly STATUS_CHECK_INTERVAL = 3000; // Changed from 10000 to 3000 ms
 
   constructor(private uploadService: UploadService) {}
 
@@ -107,10 +108,8 @@ export class UploadComponent implements OnDestroy {
     this.uploadedFiles.push({
       jobId,
       fileName: this.selectedFile?.name || 'Unknown file',
-      status: FileProcessingStatus.WAITING,
+      status: FileProcessingStatus.QUEUED,
     });
-
-    console.log(this.uploadedFiles);
 
     this.startProcessingCheck(jobId);
   }
@@ -119,13 +118,13 @@ export class UploadComponent implements OnDestroy {
     this.isUploading = false;
     this.uploadProgress = 0;
     this.uploadSubscription = null;
-    this.processingStatus = FileProcessingStatus.ERROR;
+    this.processingStatus = FileProcessingStatus.FAILED;
 
     // Add file to uploadedFiles with error status
     this.uploadedFiles.push({
       jobId: 'error',
       fileName: this.selectedFile?.name || 'Unknown file',
-      status: FileProcessingStatus.ERROR,
+      status: FileProcessingStatus.FAILED,
       error: error.error?.error?.message || error.error?.message || 'File upload error',
     });
 
@@ -142,61 +141,29 @@ export class UploadComponent implements OnDestroy {
     }
   }
 
-  private startProcessingCheck(jobId: string): void {
-    this.clearStatusCheck();
-
-    const existingFile = this.uploadedFiles.find(
-      (f) => f.jobId === jobId && (f.status === FileProcessingStatus.COMPLETED || f.fileUrl)
-    );
-
-    if (existingFile) {
-      return;
-    }
-
-    this.processingStatus = FileProcessingStatus.WAITING;
-
-    this.statusCheckInterval = setInterval(() => {
-      const pendingFiles = this.uploadedFiles.filter(
-        (f) =>
-          f.status !== FileProcessingStatus.COMPLETED && f.status !== FileProcessingStatus.ERROR
-      );
-
-      if (pendingFiles.length === 0) {
-        this.clearStatusCheck();
-        return;
-      }
-
-      const jobIds = pendingFiles.map((f) => f.jobId);
-      console.log('JOB_IDS', jobIds);
-      this.uploadService.getBatchStatus(jobIds).subscribe({
-        next: (statuses) => {
-          console.log('STATUS_UPDATES', statuses);
-          statuses.forEach((status, index) => {
-            this.handleStatusUpdate(status, pendingFiles[index].jobId);
-          });
-        },
-        error: this.handleStatusError.bind(this),
-      });
-    }, this.STATUS_CHECK_INTERVAL);
-  }
-
   private handleStatusUpdate(status: any, jobId: string): void {
+    console.log('Handling status update:', { status, jobId });
+    
     const fileIndex = this.uploadedFiles.findIndex((f) => f.jobId === jobId);
     if (fileIndex === -1) return;
 
     const file = this.uploadedFiles[fileIndex];
+    console.log('Current file status:', file.status);
 
     const statusMap: Record<string, FileProcessingStatus> = {
-      queued: FileProcessingStatus.WAITING,
+      queued: FileProcessingStatus.QUEUED,
       processing: FileProcessingStatus.PROCESSING,
       completed: FileProcessingStatus.COMPLETED,
-      failed: FileProcessingStatus.ERROR,
-      not_found: FileProcessingStatus.ERROR,
+      failed: FileProcessingStatus.FAILED,
+      not_found: FileProcessingStatus.NOT_FOUND
     };
 
-    file.status = statusMap[status.status as keyof typeof statusMap] || FileProcessingStatus.ERROR;
-    console.log('FILE_STATUS', file);
-    console.log('STATUS', status);
+    const newStatus = statusMap[status.status as keyof typeof statusMap] || FileProcessingStatus.FAILED;
+    console.log('Mapped new status:', newStatus);
+
+    file.status = newStatus;
+    console.log('Updated file status:', file.status);
+
     if (status.status === 'completed') {
       file.fileUrl = status.fileUrl;
       file.error = undefined;
@@ -206,15 +173,13 @@ export class UploadComponent implements OnDestroy {
       if (status.error?.validation) {
         file.validationError = status.error.validation;
       }
-      this.uploadStatus = file.error || 'File upload error';
     }
 
     this.uploadedFiles = [...this.uploadedFiles];
-    console.log('Updated file:', file);
   }
 
   private handleStatusError(): void {
-    this.processingStatus = FileProcessingStatus.ERROR;
+    this.processingStatus = FileProcessingStatus.FAILED;
     this.uploadStatus = 'Error checking status';
     this.clearStatusCheck();
   }
@@ -224,6 +189,39 @@ export class UploadComponent implements OnDestroy {
       clearInterval(this.statusCheckInterval);
       this.statusCheckInterval = null;
     }
+  }
+
+  private startProcessingCheck(jobId: string): void {
+    this.clearStatusCheck();
+
+    const existingFile = this.uploadedFiles.find(
+      (f) => f.jobId === jobId && f.status === FileProcessingStatus.COMPLETED
+    );
+
+    if (existingFile) {
+      return;
+    }
+
+    this.statusCheckInterval = setInterval(() => {
+      const pendingFiles = this.uploadedFiles.filter(
+        (f) => ![FileProcessingStatus.COMPLETED, FileProcessingStatus.FAILED].includes(f.status)
+      );
+
+      if (pendingFiles.length === 0) {
+        this.clearStatusCheck();
+        return;
+      }
+
+      const jobIds = pendingFiles.map((f) => f.jobId);
+      this.uploadService.getBatchStatus(jobIds).subscribe({
+        next: (statuses) => {
+          statuses.forEach((status, index) => {
+            this.handleStatusUpdate(status, pendingFiles[index].jobId);
+          });
+        },
+        error: this.handleStatusError.bind(this),
+      });
+    }, this.STATUS_CHECK_INTERVAL);
   }
 
   getFileSize(bytes: number): string {

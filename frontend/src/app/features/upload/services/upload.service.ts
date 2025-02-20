@@ -4,7 +4,7 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
 export interface ConversionStatus {
-  status: 'pending' | 'processing' | 'completed' | 'failed';
+  status: 'queued' | 'processing' | 'completed' | 'failed' | 'not_found';
   fileUrl?: string;
   error?: string;
 }
@@ -18,7 +18,7 @@ export interface UploadProgress {
 export interface ConversionResponse {
   success: boolean;
   data: {
-    status: 'pending' | 'processing' | 'completed' | 'failed';
+    status: 'queued' | 'processing' | 'completed' | 'failed' | 'not_found';
     outputUrl?: string;
     error?: string;
   };
@@ -93,12 +93,7 @@ export class UploadService {
       .pipe(
         map((response) =>
           response.data.jobs.map((job) => ({
-            status:
-              job.status === 'queued'
-                ? 'pending'
-                : job.status === 'not_found'
-                  ? 'failed'
-                  : job.status,
+            status: job.status === 'not_found' ? 'failed' : job.status,
             fileUrl: job.outputUrl,
             error: job.error?.message,
           }))

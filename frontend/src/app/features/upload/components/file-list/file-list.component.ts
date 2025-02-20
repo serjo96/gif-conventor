@@ -18,11 +18,19 @@ export class FileListComponent {
 
   getStatusMessage(status: FileProcessingStatus): string {
     const messages = {
-      [FileProcessingStatus.WAITING]: 'Waiting...',
+      [FileProcessingStatus.QUEUED]: 'Queued',
       [FileProcessingStatus.PROCESSING]: 'Processing...',
       [FileProcessingStatus.COMPLETED]: 'Completed',
-      [FileProcessingStatus.ERROR]: 'Error',
+      [FileProcessingStatus.FAILED]: 'Failed',
+      [FileProcessingStatus.NOT_FOUND]: 'Not Found'
     };
-    return messages[status];
+    return messages[status] || 'Unknown status';
+  }
+
+  isProcessing(status: FileProcessingStatus): boolean {
+    return [
+      FileProcessingStatus.QUEUED,
+      FileProcessingStatus.PROCESSING
+    ].includes(status);
   }
 }

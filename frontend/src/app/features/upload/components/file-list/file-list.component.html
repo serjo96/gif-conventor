@@ -12,7 +12,11 @@
         <span class="file-name">{{ file.fileName }}</span>
         <span
           class="file-status"
-          [ngClass]="file.status.toLowerCase()"
+          [ngClass]="{
+            'processing': isProcessing(file.status),
+            'completed': file.status === FileProcessingStatus.COMPLETED,
+            'error': file.status === FileProcessingStatus.FAILED || file.status === FileProcessingStatus.NOT_FOUND
+          }"
         >
           {{ getStatusMessage(file.status) }}
           <span
