@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import { conversionQueue } from '../queues';
 
-import { FileValidator } from '../utils/file.utils';
 import { ErrorCode } from '../types/api.types';
 
 export interface ConversionJob {
@@ -60,14 +59,6 @@ export class ConversionService {
     }
   }
 
-  async validateFile(file: Express.Multer.File): Promise<void> {
-    try {
-      await FileValidator.validateVideoFile(file);
-    } catch (error) {
-      throw error;
-    }
-  }
-
   async processVideo(file: Express.Multer.File): Promise<string> {
     const jobId = uuidv4();
     const originalName = path.parse(file.originalname).name.replace(/[^a-zA-Z0-9]/g, '_');
@@ -76,18 +67,6 @@ export class ConversionService {
 
     try {
       await fs.rename(file.path, inputPath);
-
-      console.log('[DEBUG] After rename:', {
-        sourceExists: await fs
-          .access(file.path)
-          .then(() => true)
-          .catch(() => false),
-        destinationExists: await fs
-          .access(inputPath)
-          .then(() => true)
-          .catch(() => false),
-        inputDirContents: await fs.readdir(this.inputDir)
-      });
 
       await conversionQueue.add(
         'convert',
@@ -119,7 +98,7 @@ export class ConversionService {
     const jobState = await queueJob.getState();
     const status = this.mapBullState(jobState);
     const originalName = queueJob.data.originalName || jobId;
-    console.log('ORIGINAL_NAME_SERVICE', originalName);
+
     return {
       id: jobId,
       status,

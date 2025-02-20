@@ -1,9 +1,10 @@
 import { Response, NextFunction, Request } from 'express';
-import { ApiError, ApiResponse, ConversionResponse, BatchStatusResponse } from '../types/api.types';
+import { ApiError, ApiResponse } from '../types/api.types';
 import { FileRequest } from '../types/request.types';
 import { ConversionService } from '../services/conversion.service';
 import config from '../config';
 import { ErrorCode } from '../types/api.types';
+import { FileValidator } from '../utils/file.utils';
 
 interface JobStatus {
   jobId: string;
@@ -21,7 +22,7 @@ export class ConversionController {
   uploadVideo = async (req: FileRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       this.validateUploadRequest(req);
-      
+
       const jobId = await this.processVideoUpload(req.file!);
 
       this.sendSuccessResponse(res, {
@@ -40,7 +41,7 @@ export class ConversionController {
   ): Promise<void> => {
     try {
       this.validateBatchStatusRequest(req);
-      
+
       const statuses = await this.getJobStatuses(req.body.jobIds);
 
       this.sendSuccessResponse(res, { jobs: statuses });
@@ -56,7 +57,7 @@ export class ConversionController {
   }
 
   private async processVideoUpload(file: Express.Multer.File): Promise<string> {
-    await this.conversionService.validateFile(file);
+    await FileValidator.validateVideoFile(file);
     return this.conversionService.processVideo(file);
   }
 
