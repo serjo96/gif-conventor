@@ -52,7 +52,6 @@ export class ConversionService {
   private async removeFile(filePath: string): Promise<void> {
     try {
       await fs.access(filePath);
-      // await fs.unlink(filePath);
       console.log(`[DEBUG] Would remove file: ${filePath}`);
     } catch (error) {
       if (error instanceof Error && (error as any).code !== 'ENOENT') {
@@ -65,8 +64,6 @@ export class ConversionService {
     try {
       await FileValidator.validateVideoFile(file);
     } catch (error) {
-      // await this.removeFile(file.path);
-      console.log(`[DEBUG] Would remove invalid file: ${file.path}`);
       throw error;
     }
   }
@@ -76,26 +73,6 @@ export class ConversionService {
     const originalName = path.parse(file.originalname).name.replace(/[^a-zA-Z0-9]/g, '_');
     const inputFileName = `${jobId}-${path.basename(file.filename)}`;
     const inputPath = path.join(this.inputDir, inputFileName);
-
-    console.log('[DEBUG] File processing details:', {
-      jobId,
-      originalFile: {
-        path: file.path,
-        name: file.originalname,
-        exists: await fs
-          .access(file.path)
-          .then(() => true)
-          .catch(() => false)
-      },
-      destination: {
-        path: inputPath,
-        dir: this.inputDir,
-        dirExists: await fs
-          .access(this.inputDir)
-          .then(() => true)
-          .catch(() => false)
-      }
-    });
 
     try {
       await fs.rename(file.path, inputPath);
@@ -128,7 +105,7 @@ export class ConversionService {
 
       return jobId;
     } catch (error) {
-      console.error('[ERROR] Video processing failed:', error);
+      console.error('Video processing failed:', error);
       throw error;
     }
   }

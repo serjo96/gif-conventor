@@ -5,7 +5,7 @@ import { spawn } from 'child_process';
 export class FileValidator {
   static readonly MAX_WIDTH = 1024;
   static readonly MAX_HEIGHT = 768;
-  static readonly MAX_DURATION = 10; // seconds
+  static readonly MAX_DURATION = 10;
 
   static async validateVideoFile(file: Express.Multer.File): Promise<void> {
     const { fileTypeFromFile } = await loadEsm<typeof import('file-type')>('file-type');
