@@ -38,25 +38,3 @@ export interface ApiSuccessResponse<T> {
 }
 
 export type ApiResponse<T> = ApiSuccessResponse<T> | ApiErrorResponse;
-
-export interface ConversionResponse {
-  jobId: string;
-  status: 'queued' | 'processing' | 'completed' | 'failed';
-  outputUrl?: string;
-  error?: {
-    message: string;
-    code?: ErrorCode;
-  };
-}
-
-export interface BatchStatusResponse {
-  jobs: Array<{
-    jobId: string;
-    status: 'queued' | 'processing' | 'completed' | 'failed' | 'not_found';
-    outputUrl?: string;
-    error?: {
-      message: string;
-      code: ErrorCode;
-    };
-  }>;
-}

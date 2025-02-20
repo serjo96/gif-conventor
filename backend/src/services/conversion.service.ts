@@ -48,17 +48,6 @@ export class ConversionService {
     }
   }
 
-  private async removeFile(filePath: string): Promise<void> {
-    try {
-      await fs.access(filePath);
-      console.log(`[DEBUG] Would remove file: ${filePath}`);
-    } catch (error) {
-      if (error instanceof Error && (error as any).code !== 'ENOENT') {
-        console.error(`Failed to remove file ${filePath}:`, error);
-      }
-    }
-  }
-
   async processVideo(file: Express.Multer.File): Promise<string> {
     const jobId = uuidv4();
     const originalName = path.parse(file.originalname).name.replace(/[^a-zA-Z0-9]/g, '_');
