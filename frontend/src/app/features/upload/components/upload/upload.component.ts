@@ -50,6 +50,7 @@ export class UploadComponent implements OnDestroy {
   private statusCheckInterval: any;
   uploadedFiles: UploadedFile[] = [];
   readonly STATUS_CHECK_INTERVAL = 3000; // Changed from 10000 to 3000 ms
+  isFileValid = false;
 
   constructor(
     private uploadService: UploadService,
@@ -65,9 +66,12 @@ export class UploadComponent implements OnDestroy {
     const input = event.target as HTMLInputElement;
     if (input.files?.length) {
       const file = input.files[0];
-      if (this.validateFile(file)) {
+      this.isFileValid = this.validateFile(file);
+      if (this.isFileValid) {
         this.selectedFile = file;
         this.uploadStatus = '';
+      } else {
+        this.selectedFile = null;
       }
     }
   }
