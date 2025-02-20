@@ -23,7 +23,6 @@ const upload = multer({
 });
 
 router.post('/upload', upload.single('video'), conversionController.uploadVideo);
-router.get('/status/:jobId', conversionController.getStatus);
 router.post('/status', conversionController.getBatchStatus);
 
 export default router;
