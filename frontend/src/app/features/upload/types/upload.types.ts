@@ -1,3 +1,4 @@
+
 export enum FileProcessingStatus {
   QUEUED = 'queued',
   PROCESSING = 'processing',
@@ -23,8 +24,3 @@ export interface StatusResponse {
     validation?: string;
   };
 }
-
-export interface FileValidationResult {
-  isValid: boolean;
-  error?: string;
-} 

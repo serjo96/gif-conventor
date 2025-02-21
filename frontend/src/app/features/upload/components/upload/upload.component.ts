@@ -7,24 +7,8 @@ import { Subscription } from 'rxjs';
 import { FileListComponent } from '../file-list/file-list.component';
 import { environment } from '../../../../../environments/environment';
 import { FileStatusService } from '../../services/file-status.service';
-import { StatusResponse } from '../../types/upload.types';
+import {FileProcessingStatus, StatusResponse, UploadedFile} from '../../types/upload.types';
 
-export enum FileProcessingStatus {
-  QUEUED = 'queued',
-  PROCESSING = 'processing',
-  COMPLETED = 'completed',
-  FAILED = 'failed',
-  NOT_FOUND = 'not_found'
-}
-
-export interface UploadedFile {
-  jobId: string;
-  fileName: string;
-  status: FileProcessingStatus;
-  fileUrl?: string;
-  error?: string;
-  validationError?: string;
-}
 
 @Component({
   selector: 'app-upload',

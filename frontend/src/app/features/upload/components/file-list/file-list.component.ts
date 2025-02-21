@@ -1,8 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
-import { UploadedFile } from '../upload/upload.component';
-import { FileProcessingStatus } from '../upload/upload.component';
+import { UploadedFile, FileProcessingStatus } from '../../types/upload.types';
 
 @Component({
   selector: 'app-file-list',
