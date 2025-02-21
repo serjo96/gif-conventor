@@ -35,7 +35,7 @@ services:
     networks:
       - app-network
     deploy:
-      replicas: 2
+      replicas: 1
       restart_policy:
         condition: any
         delay: 5s
@@ -83,8 +83,11 @@ services:
         failure_action: rollback
       resources:
         limits:
-          cpus: '0.75'
-          memory: 1G
+          cpus: '1.0'
+          memory: '1.5G'
+        reservations:
+          cpus: '0.5'
+          memory: 512M
     healthcheck:
       test: ["CMD", "node", "-e", "require('bullmq').Worker.isReady()"]
       interval: 30s
@@ -102,4 +105,4 @@ volumes:
 
 networks:
   app-network:
-    driver: overlay 
+    driver: overlay
