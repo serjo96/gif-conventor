@@ -1,7 +1,7 @@
-import { ApiError } from '../types/api.types';
 import { promises as fs } from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
+import { ApiError } from '../types/api.types';
 import { conversionQueue } from '../queues';
 
 import { ErrorCode } from '../types/api.types';
@@ -65,6 +65,7 @@ export class ConversionService {
           originalName
         },
         {
+          priority: await this.calculatePriority(inputPath),
           jobId,
           removeOnComplete: false,
           removeOnFail: 1000 * 60 * 60 * 24
@@ -115,5 +116,10 @@ export class ConversionService {
       default:
         return 'queued';
     }
+  }
+
+  private async calculatePriority(filePath: string): Promise<number> {
+    const stats = await fs.stat(filePath);
+    return stats.size > 10 * 1024 * 1024 ? 2 : 1;
   }
 }

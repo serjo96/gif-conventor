@@ -9,19 +9,28 @@
       class="hidden"
     />
 
-    <div class="upload-area" (click)="fileInput.click()">
+    <div
+      class="upload-area"
+      (click)="fileInput.click()"
+    >
       <div class="upload-content">
         <i class="fas fa-cloud-upload-alt upload-icon"></i>
         <p class="upload-text">
           {{ selectedFile ? selectedFile.name : 'Click here to upload file' }}
         </p>
-        <p class="upload-hint" *ngIf="!selectedFile">
+        <p
+          class="upload-hint"
+          *ngIf="!selectedFile"
+        >
           Maximum file size: {{ MAX_FILE_SIZE / 1024 / 1024 }}MB
         </p>
       </div>
     </div>
 
-    <div class="file-info" *ngIf="selectedFile">
+    <div
+      class="file-info"
+      *ngIf="selectedFile"
+    >
       <div class="file-details">
         <span class="file-name">{{ selectedFile.name }}</span>
         <span class="file-size">{{ getFileSize(selectedFile.size) }}</span>
@@ -53,7 +62,10 @@
     </div>
   </div>
 
-  <div class="status-section" *ngIf="uploadStatus || isUploading">
+  <div
+    class="status-section"
+    *ngIf="uploadStatus || isUploading"
+  >
     <div
       *ngIf="uploadStatus"
       class="status-message"
@@ -63,7 +75,10 @@
       {{ uploadStatus }}
     </div>
 
-    <div *ngIf="isUploading" class="progress-container">
+    <div
+      *ngIf="isUploading"
+      class="progress-container"
+    >
       <mat-progress-bar
         mode="determinate"
         [value]="uploadProgress"

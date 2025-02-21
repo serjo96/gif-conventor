@@ -7,18 +7,12 @@ import { Subscription } from 'rxjs';
 import { FileListComponent } from '../file-list/file-list.component';
 import { environment } from '../../../../../environments/environment';
 import { FileStatusService } from '../../services/file-status.service';
-import {FileProcessingStatus, StatusResponse, UploadedFile} from '../../types/upload.types';
-
+import { FileProcessingStatus, StatusResponse, UploadedFile } from '../../types/upload.types';
 
 @Component({
   selector: 'app-upload',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatButtonModule,
-    MatProgressBarModule,
-    FileListComponent
-  ],
+  imports: [CommonModule, MatButtonModule, MatProgressBarModule, FileListComponent],
   templateUrl: './upload.component.html',
   styleUrls: ['./upload.component.scss'],
 })
@@ -180,8 +174,8 @@ export class UploadComponent implements OnDestroy {
     if (existingFile) return;
 
     this.statusCheckInterval = setInterval(() => {
-      const pendingFiles = this.uploadedFiles.filter(
-        (f) => this.fileStatusService.isPending(f.status)
+      const pendingFiles = this.uploadedFiles.filter((f) =>
+        this.fileStatusService.isPending(f.status)
       );
 
       if (pendingFiles.length === 0) {

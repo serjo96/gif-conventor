@@ -1,4 +1,5 @@
 import { Worker, Job } from 'bullmq';
+import { conversionQueue } from './queues';
 import config from './config';
 import { FFmpegConverter } from './utils/ffmpeg.utils';
 import { promises as fs } from 'fs';
@@ -8,6 +9,12 @@ interface JobData {
   inputPath: string;
   jobId: string;
   originalName: string;
+  timings: {
+    startedAt: number | null;
+    enqueuedAt: number;
+    ffmpegStartedAt?: number | null;
+    completedAt?: number | null;
+  };
 }
 
 interface JobResult {
@@ -24,12 +31,38 @@ const PROGRESS_STAGES = {
 
 const worker = new Worker<JobData, JobResult>(
   'video-conversion',
-  async (job: Job<JobData>) => {
-    const { inputPath, jobId, originalName } = job.data;
+  async (job) => {
+    const { jobId, inputPath } = job.data;
+
+    if (!job.data.timings) {
+      job.data.timings = {
+        enqueuedAt: Date.now(),
+        startedAt: 0,
+        ffmpegStartedAt: 0,
+        completedAt: 0
+      };
+    }
+
+    console.log(`[Job ${jobId}] Received job data:`, {
+      inputPath,
+      timings: job.data.timings,
+      jobAttempt: job.attemptsMade + 1,
+      timestamp: new Date().toISOString()
+    });
 
     try {
-      await job.updateProgress(PROGRESS_STAGES.STARTED);
-      await job.log(`Starting conversion attempt ${job.attemptsMade + 1}`);
+      job.data.timings.startedAt = Date.now();
+      console.log(
+        `[Job ${jobId}] Started at: ${new Date(job.data.timings.startedAt).toISOString()}`
+      );
+      console.log(
+        `[Job ${jobId}] Time in queue: ${(job.data.timings.startedAt - job.data.timings.enqueuedAt) / 1000}s`
+      );
+
+      job.data.timings.ffmpegStartedAt = Date.now();
+      console.log(
+        `[Job ${jobId}] FFmpeg started at: ${new Date(job.data.timings.ffmpegStartedAt).toISOString()}`
+      );
 
       // Validate input file exists
       const fileExists = await validateInputFile(inputPath);
@@ -41,7 +74,7 @@ const worker = new Worker<JobData, JobResult>(
 
       // Convert file
       await job.updateProgress(PROGRESS_STAGES.CONVERSION_PREP);
-      await FFmpegConverter.convertToGif(inputPath, jobId, originalName);
+      await FFmpegConverter.convertToGif(inputPath, jobId, job.data.originalName);
       await job.updateProgress(PROGRESS_STAGES.CONVERSION_DONE);
 
       // Cleanup
@@ -49,11 +82,25 @@ const worker = new Worker<JobData, JobResult>(
       await job.updateProgress(PROGRESS_STAGES.COMPLETED);
       await job.log('Conversion completed successfully');
 
+      job.data.timings.completedAt = Date.now();
+      console.log(
+        `[Job ${jobId}] Completed at: ${new Date(job.data.timings.completedAt).toISOString()}`
+      );
+      console.log(`[Job ${jobId}] Processing summary:
+        Total duration: ${(job.data.timings.completedAt - job.data.timings.enqueuedAt) / 1000}s
+        Queue time: ${(job.data.timings.startedAt - job.data.timings.enqueuedAt) / 1000}s
+        FFmpeg time: ${(job.data.timings.completedAt - job.data.timings.ffmpegStartedAt) / 1000}s`);
+
       return {
-        outputPath: path.join('uploads/output', `${jobId}-${originalName}.gif`)
+        outputPath: path.join('uploads/output', `${jobId}-${job.data.originalName}.gif`)
       };
     } catch (error) {
-      await handleJobError(job, error);
+      console.error(`[Job ${jobId}] Failed with error:`, {
+        error: error instanceof Error ? error.message : String(error),
+        attempt: job.attemptsMade + 1,
+        timings: job.data.timings,
+        timestamp: new Date().toISOString()
+      });
       throw error;
     }
   },
@@ -61,9 +108,13 @@ const worker = new Worker<JobData, JobResult>(
     connection: {
       host: config.redis.host,
       port: config.redis.port,
-      password: config.redis.password
+      password: config.redis.password,
+      enableReadyCheck: false,
+      maxRetriesPerRequest: 3
     },
-    concurrency: 3,
+    concurrency: 5,
+    lockDuration: 20000,
+    stalledInterval: 20000,
     limiter: {
       max: 50,
       duration: 1000 * 30
@@ -81,31 +132,18 @@ async function validateInputFile(inputPath: string): Promise<boolean> {
   }
 }
 
-async function handleJobError(job: Job<JobData>, error: unknown): Promise<void> {
-  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-  await job.log(`Failed with error: ${errorMessage}`);
-}
-
 // Event handlers
-worker.on('failed', async (job: Job<JobData> | undefined, err: Error) => {
-  if (!job) return;
-
-  const logContext = {
-    jobId: job.id,
-    attemptsMade: job.attemptsMade,
-    maxAttempts: job.opts.attempts,
-    error: err.message
-  };
-
-  console.error('Job failed:', logContext);
-
-  if (job.attemptsMade >= (job.opts.attempts || 1)) {
-    console.log(`Job ${job.id} has failed all retry attempts`);
-  }
+worker.on('error', (err) => {
+  console.error('Worker error:', err);
 });
 
-worker.on('completed', (job: Job<JobData>) => {
-  console.log(`Job ${job.id} completed successfully`);
+worker.on('failed', (job, err) => {
+  console.error(`Job ${job?.id} failed:`, err);
+});
+
+worker.on('completed', (job) => {
+  const processingTime = Date.now() - (job.data.timings.startedAt ?? Date.now());
+  console.log(`Job ${job.id} completed in ${processingTime}ms`);
 });
 
 // Graceful shutdown handlers

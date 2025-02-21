@@ -69,13 +69,14 @@ export class UploadService {
 
   getStatus(jobId: string): Observable<StatusResponse> {
     return this.http
-      .get<ApiResponse<{ status: FileProcessingStatus; outputUrl?: string; error?: string }>>
-      (`${this.apiUrl}/conversion/status/${jobId}`)
+      .get<
+        ApiResponse<{ status: FileProcessingStatus; outputUrl?: string; error?: string }>
+      >(`${this.apiUrl}/conversion/status/${jobId}`)
       .pipe(
         map((response) => ({
           status: response.data.status,
           fileUrl: response.data.outputUrl,
-          error: response.data.error ? { message: response.data.error } : undefined
+          error: response.data.error ? { message: response.data.error } : undefined,
         }))
       );
   }
@@ -86,11 +87,12 @@ export class UploadService {
       .pipe(
         map((response) =>
           response.data.jobs.map((job) => ({
-            status: job.status === FileProcessingStatus.NOT_FOUND 
-              ? FileProcessingStatus.FAILED 
-              : job.status,
+            status:
+              job.status === FileProcessingStatus.NOT_FOUND
+                ? FileProcessingStatus.FAILED
+                : job.status,
             fileUrl: job.outputUrl,
-            error: job.error ? { message: job.error.message } : undefined
+            error: job.error ? { message: job.error.message } : undefined,
           }))
         )
       );

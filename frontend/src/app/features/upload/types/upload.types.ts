@@ -1,10 +1,9 @@
-
 export enum FileProcessingStatus {
   QUEUED = 'queued',
   PROCESSING = 'processing',
   COMPLETED = 'completed',
   FAILED = 'failed',
-  NOT_FOUND = 'not_found'
+  NOT_FOUND = 'not_found',
 }
 
 export interface UploadedFile {
