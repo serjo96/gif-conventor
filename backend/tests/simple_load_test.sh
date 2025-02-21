@@ -38,9 +38,10 @@ if [ ! -f "$TEST_FILE" ]; then
     exit 1
 fi
 
-# Create results directory
-mkdir -p results
-RESULTS_FILE="results/load_test_$(date +%Y%m%d_%H%M%S).txt"
+# Get script directory and create results directory
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+mkdir -p "$SCRIPT_DIR/results"
+RESULTS_FILE="$SCRIPT_DIR/results/load_test_$(date +%Y%m%d_%H%M%S).txt"
 echo "Timestamp,Response_Time,Status" > "$RESULTS_FILE"
 
 echo "Starting load test with following parameters:"
@@ -68,7 +69,7 @@ for i in $(seq 1 $REQUESTS); do
         request_end=$(date +%s.%N)
         duration=$(echo "$request_end - $request_start" | bc)
         echo "$(date +%Y-%m-%d_%H:%M:%S),$duration,$status_code" >> "$RESULTS_FILE"
-        
+
         # Progress indicator
         if [ $((i % 10)) -eq 0 ]; then
             echo "Completed $i requests..."
@@ -103,4 +104,4 @@ echo "Requests per second: $requests_per_second"
 
 # Print status code distribution
 echo -e "\nStatus code distribution:"
-cut -d',' -f3 "$RESULTS_FILE" | sort | uniq -c | tail -n +2 
+cut -d',' -f3 "$RESULTS_FILE" | sort | uniq -c | tail -n +2
