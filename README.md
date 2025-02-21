@@ -61,7 +61,6 @@ The service consists of three main components:
 - ESLint & Prettier for code quality
 - Nodemon for development reload
 - TypeScript compiler
-- Load testing scripts
 
 ### Monitoring
 - Bull Board UI for queue monitoring
@@ -75,7 +74,6 @@ The service consists of three main components:
 - Node.js 18 or higher
 - Yarn package manager (`npm install -g yarn`)
 - Docker and Docker Compose
-- FFmpeg installed locally (for development)
 
 ### Environment Setup
 
@@ -186,7 +184,6 @@ The script provides real-time statistics including:
 
 Default configuration handles:
 - 1000 requests per minute rate limit
-- 3 concurrent jobs per worker
 - 5 worker instances in production deployment
 
 ## API Documentation
@@ -351,8 +348,8 @@ The project includes a simple load testing script to simulate concurrent uploads
 # Custom test parameters
 ./backend/tests/simple_load_test.sh \
   -f path/to/test.mp4 \
-  -n 1000 \            # Number of requests
-  -p 20 \              # Max parallel requests
+  -n 1000 \
+  -p 20 \
   -u http://localhost:3000/api/conversion/upload
 ```
 
