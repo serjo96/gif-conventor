@@ -1,6 +1,6 @@
 import { ApiError } from '../types/api.types';
-import { loadEsm } from 'load-esm';
 import { spawn } from 'child_process';
+import path from 'path';
 
 export class FileValidator {
   static readonly MAX_WIDTH = 1024;
@@ -8,15 +8,19 @@ export class FileValidator {
   static readonly MAX_DURATION = 10;
 
   static async validateVideoFile(file: Express.Multer.File): Promise<void> {
-    const { fileTypeFromFile } = await loadEsm<typeof import('file-type')>('file-type');
-    const fileType = await fileTypeFromFile(file.path);
+    this.validateFileType(file.path);
 
-    if (!fileType || !['mp4', 'm4v'].includes(fileType.ext)) {
+    await Promise.all([
+      this.validateVideoDimensions(file.path),
+      this.validateVideoDuration(file.path)
+    ]);
+  }
+
+  private static validateFileType(filePath: string): void {
+    const ext = path.extname(filePath).toLowerCase();
+    if (!['.mp4', '.m4v'].includes(ext)) {
       throw new ApiError(400, 'Only MP4 files are allowed');
     }
-
-    await this.validateVideoDimensions(file.path);
-    await this.validateVideoDuration(file.path);
   }
 
   private static async validateVideoDimensions(filePath: string): Promise<void> {
