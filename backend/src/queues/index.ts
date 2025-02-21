@@ -11,10 +11,16 @@ export const conversionQueue = new Queue('video-conversion', {
     attempts: 3,
     backoff: {
       type: 'exponential',
-      delay: 2000
+      delay: 1000
     },
-    removeOnComplete: true,
-    removeOnFail: false
+    removeOnComplete: {
+      count: 1000,
+      age: 3600
+    },
+    removeOnFail: {
+      count: 500
+    },
+    priority: 1,
   }
 });
 
