@@ -25,7 +25,9 @@ services:
   backend:
     image: ${REGISTRY:-localhost}/mp4-to-gif-backend:${TAG:-latest}
     ports:
-      - "3000:3000"
+       - target: 3000
+         published: 3000
+         mode: host
     volumes:
       - uploads:/app/uploads
     env_file:
@@ -54,6 +56,10 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    environment:
+      - NODE_ENV=production
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
 
   worker:
     image: ${REGISTRY:-localhost}/mp4-to-gif-worker:${TAG:-latest}
@@ -85,6 +91,10 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    environment:
+      - NODE_ENV=production
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
 
 volumes:
   redis-data:
