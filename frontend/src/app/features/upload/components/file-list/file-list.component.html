@@ -13,9 +13,11 @@
         <span
           class="file-status"
           [ngClass]="{
-            'processing': isProcessing(file.status),
-            'completed': file.status === FileProcessingStatus.COMPLETED,
-            'error': file.status === FileProcessingStatus.FAILED || file.status === FileProcessingStatus.NOT_FOUND
+            processing: isProcessing(file.status),
+            completed: file.status === FileProcessingStatus.COMPLETED,
+            error:
+              file.status === FileProcessingStatus.FAILED ||
+              file.status === FileProcessingStatus.NOT_FOUND,
           }"
         >
           {{ getStatusMessage(file.status) }}

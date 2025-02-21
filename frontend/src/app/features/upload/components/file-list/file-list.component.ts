@@ -21,15 +21,12 @@ export class FileListComponent {
       [FileProcessingStatus.PROCESSING]: 'Processing...',
       [FileProcessingStatus.COMPLETED]: 'Completed',
       [FileProcessingStatus.FAILED]: 'Failed',
-      [FileProcessingStatus.NOT_FOUND]: 'Not Found'
+      [FileProcessingStatus.NOT_FOUND]: 'Not Found',
     };
     return messages[status] || 'Unknown status';
   }
 
   isProcessing(status: FileProcessingStatus): boolean {
-    return [
-      FileProcessingStatus.QUEUED,
-      FileProcessingStatus.PROCESSING
-    ].includes(status);
+    return [FileProcessingStatus.QUEUED, FileProcessingStatus.PROCESSING].includes(status);
   }
 }

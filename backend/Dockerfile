@@ -11,9 +11,8 @@ ENTRYPOINT ["/sbin/tini", "--"]
 
 COPY package*.json yarn.lock ./
 RUN yarn install
-
-# For development, we'll mount the source code as a volume
 COPY . .
+
 
 # Build TypeScript
 RUN yarn build
