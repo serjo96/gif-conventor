@@ -34,7 +34,6 @@ const worker = new Worker<JobData, JobResult>(
   async (job) => {
     const { jobId, inputPath } = job.data;
 
-    // Инициализируем timings если его нет
     if (!job.data.timings) {
       job.data.timings = {
         enqueuedAt: Date.now(),
@@ -44,7 +43,6 @@ const worker = new Worker<JobData, JobResult>(
       };
     }
 
-    // Добавим больше диагностической информации
     console.log(`[Job ${jobId}] Received job data:`, {
       inputPath,
       timings: job.data.timings,
@@ -54,11 +52,17 @@ const worker = new Worker<JobData, JobResult>(
 
     try {
       job.data.timings.startedAt = Date.now();
-      console.log(`[Job ${jobId}] Started at: ${new Date(job.data.timings.startedAt).toISOString()}`);
-      console.log(`[Job ${jobId}] Time in queue: ${(job.data.timings.startedAt - job.data.timings.enqueuedAt) / 1000}s`);
+      console.log(
+        `[Job ${jobId}] Started at: ${new Date(job.data.timings.startedAt).toISOString()}`
+      );
+      console.log(
+        `[Job ${jobId}] Time in queue: ${(job.data.timings.startedAt - job.data.timings.enqueuedAt) / 1000}s`
+      );
 
       job.data.timings.ffmpegStartedAt = Date.now();
-      console.log(`[Job ${jobId}] FFmpeg started at: ${new Date(job.data.timings.ffmpegStartedAt).toISOString()}`);
+      console.log(
+        `[Job ${jobId}] FFmpeg started at: ${new Date(job.data.timings.ffmpegStartedAt).toISOString()}`
+      );
 
       // Validate input file exists
       const fileExists = await validateInputFile(inputPath);
@@ -79,7 +83,9 @@ const worker = new Worker<JobData, JobResult>(
       await job.log('Conversion completed successfully');
 
       job.data.timings.completedAt = Date.now();
-      console.log(`[Job ${jobId}] Completed at: ${new Date(job.data.timings.completedAt).toISOString()}`);
+      console.log(
+        `[Job ${jobId}] Completed at: ${new Date(job.data.timings.completedAt).toISOString()}`
+      );
       console.log(`[Job ${jobId}] Processing summary:
         Total duration: ${(job.data.timings.completedAt - job.data.timings.enqueuedAt) / 1000}s
         Queue time: ${(job.data.timings.startedAt - job.data.timings.enqueuedAt) / 1000}s
@@ -127,7 +133,7 @@ async function validateInputFile(inputPath: string): Promise<boolean> {
 }
 
 // Event handlers
-worker.on('error', err => {
+worker.on('error', (err) => {
   console.error('Worker error:', err);
 });
 

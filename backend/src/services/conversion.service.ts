@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import { conversionQueue } from '../queues';
 
-
 import { ErrorCode } from '../types/api.types';
 
 export interface ConversionJob {

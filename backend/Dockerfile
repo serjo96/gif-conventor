@@ -9,12 +9,10 @@ RUN apk add --no-cache ffmpeg curl
 RUN apk add --no-cache tini
 ENTRYPOINT ["/sbin/tini", "--"]
 
-# Копируем только файлы зависимостей
 COPY package*.json yarn.lock ./
 RUN yarn install
-
-# Копируем остальные файлы
 COPY . .
+
 
 # Build TypeScript
 RUN yarn build

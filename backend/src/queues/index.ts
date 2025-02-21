@@ -20,7 +20,7 @@ export const conversionQueue = new Queue('video-conversion', {
     removeOnFail: {
       count: 500
     },
-    priority: 1,
+    priority: 1
   }
 });
 
