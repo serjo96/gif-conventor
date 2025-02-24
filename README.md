@@ -122,6 +122,13 @@ yarn dev    # API server
 yarn worker # Conversion worker
 ```
 
+Start the frontend application:
+```bash
+cd frontend        # Navigate to frontend directory
+yarn install       # Install frontend dependencies
+yarn start        # Start Angular development server
+```
+
 Access:
 - Frontend: http://localhost:4200
 - API: http://localhost:3000
